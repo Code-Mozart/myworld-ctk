@@ -1,0 +1,10 @@
+en:
+  editor_window:
+    title: My World
+    menu:
+      file:
+        title: File
+        new: New
+        open: Open...
+        save: Save
+        save_as: Save As...
