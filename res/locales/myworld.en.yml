@@ -2,6 +2,8 @@ en:
   editor_window:
     title: My World
     menu:
+      apple:
+        about: About My World
       file:
         title: File
         new: New

@@ -1,0 +1,5 @@
+materials:
+  water:
+    translation_key: myworld.project.world_materials.water.name
+    color: "#2020d0"
+default: water
