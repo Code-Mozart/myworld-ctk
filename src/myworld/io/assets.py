@@ -1,5 +1,7 @@
 import os
 
+from src.myworld.io.files import Files
+
 ASSET_ROOT = "res/assets"
 
 
@@ -31,17 +33,10 @@ class __AssetsImpl:
     def _load_asset_file(self, file, file_name_with_extension):
         file_name, extension = os.path.splitext(file_name_with_extension)
         if extension in [".yaml", ".yml"]:
-            content = self._load_asset_yaml(file)
+            content = Files.load_yaml(file)
         else:
             raise ValueError(f"Unable to load asset file {file}. Dont know how to load {extension} files.")
         self._loaded_assets[file_name] = content
-
-    @classmethod
-    def _load_asset_yaml(cls, file):
-        import yaml
-
-        with open(file, "r") as file:
-            return yaml.safe_load(file)
 
 
 Assets = __AssetsImpl()
