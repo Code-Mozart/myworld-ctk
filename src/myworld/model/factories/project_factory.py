@@ -1,6 +1,6 @@
 from pygame import Color
 
-from src.myworld.io.files import Files, FileType
+from src.myworld.io.files import Files
 from src.myworld.model.factories import world_factory
 from src.myworld.model.material import Material
 from src.myworld.model.project import Project
@@ -23,21 +23,21 @@ def load_project_from_dict(project_dict, world_dicts=None):
 
 def load_project_from_dir(
         project_dir_path,
-        on_additional_file_found=Files.raise_on_additional_file_found
+        on_unexpected_file_found=None,
 ):
     files = Files.load_file_structure(
-        file_path=project_dir_path,
-        structure={
+        dir_path=project_dir_path,
+        schema={
             "project": [".yml", ".yaml", ".json"],
             "worlds": {
                 "*": [".yml", ".yaml", ".json"],
             }
         },
-        on_additional_file_found=on_additional_file_found
+        on_unexpected_file_found=on_unexpected_file_found
     )
     return load_project_from_dict(
         project_dict=files["project"],
-        world_dicts=files["worlds"]
+        world_dicts=files["worlds"].values()
     )
 
 

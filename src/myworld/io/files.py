@@ -1,5 +1,11 @@
 from enum import Enum
 
+from src import dir_to_dict
+from src.dir_to_dict.default_callbacks import (
+    raise_on_unexpected_file_found,
+    add_file_to_dict_on_after_file_validated
+)
+
 
 class __FilesImpl:
     @classmethod
@@ -15,40 +21,28 @@ class __FilesImpl:
             return yaml.safe_load(file)
 
     @classmethod
-    def load_file_structure(cls, file_path, structure, on_additional_file_found):
-        import os
+    def load_file_structure(cls, dir_path, schema, on_unexpected_file_found=None):
+        return dir_to_dict.traverse(
+            dir_path=dir_path,
+            schema=schema,
+            on_unexpected_file_found=on_unexpected_file_found or raise_on_unexpected_file_found,
+            on_after_file_validated=cls._on_after_file_validated
+        )
 
-        cls._validate_file_structure_arg(structure)
+    @classmethod
+    def _on_after_file_validated(cls, **kwargs):
+        add_file_to_dict_on_after_file_validated(
+            on_before_file_added=cls._load_and_add_file,
+            **kwargs
+        )
 
-        files = {}
-
-        def __handle_file():
-            name_without_extension, extension = os.path.splitext(current_file_name)
-            expected_file_type = structure.get(name_without_extension, None)
-            if expected_file_type is None:
-                on_additional_file_found(current_file_name, file_path)
-            cls._validate_file_type(expected_file_type, extension, path=current_file_path)
-
-            files[name_without_extension] = cls._load_file(file_path=current_file_path, file_type=expected_file_type)
-
-        def __handle_directory():
-            expected_file_type = structure.get(current_file_name, None)
-            if expected_file_type is None:
-                on_additional_file_found(current_file_name, file_path)
-            cls._validate_file_type(expected_file_type, path=current_file_path)
-
-            files[current_file_name] = cls.load_file_structure(
-                file_path=current_file_path,
-                structure=structure[current_file_name],
-                on_additional_file_found=on_additional_file_found
-            )
-
-        for current_file_name in os.listdir(file_path):
-            current_file_path = os.path.join(file_path, current_file_name)
-            if os.path.isfile(current_file_path):
-                __handle_file()
-            elif os.path.isdir(current_file_path):
-                __handle_directory()
+    @classmethod
+    def _load_and_add_file(cls, file_path, file_name, file_extension, **kwargs):
+        if file_extension in [".yml", ".yaml", ".json"]:
+            content = cls.load_yaml(file_path)
+        else:
+            raise Exception(f"{file_extension} files are not supported")
+        return file_name, content
 
 
 Files = __FilesImpl()

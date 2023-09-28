@@ -50,6 +50,9 @@ class EditorWindow(CTk):
     def on_new_project(self):
         # check if there is a project already, that perhaps needs to be saved
 
-        self.current_project = project_factory.make_empty_project()
+        # TODO: Remove, only for development
+        self.current_project = project_factory.load_project_from_dir("res/assets/project_templates/demo_project")
+
+        #self.current_project = project_factory.make_empty_project()
         self.viewport.world = self.current_project.worlds[0]
         self.viewport.update()
