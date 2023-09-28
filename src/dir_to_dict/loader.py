@@ -1,5 +1,6 @@
 import os
 import inspect
+import re
 from typing import Callable, Optional
 
 from src.dir_to_dict.default_callbacks import (
@@ -120,9 +121,11 @@ def _traverse_dir_recursive(
         if schema is not None:
             schema_entry = schema.get(file_name, None)
             schema_value = schema_entry or schema.get("*", None)
-            allowed_types = _get_allowed_file_types(schema_value)
+            allowed_types, type_patterns = _get_allowed_file_types(schema_value)
         else:
             allowed_types = [ANY_FILE, DIRECTORY]
+            type_patterns = []
+        allowed_types_callback_arg = allowed_types + type_patterns
 
         callback_args = dict(
             dir_path=dir_path,
@@ -136,7 +139,7 @@ def _traverse_dir_recursive(
 
         _call_callback_with_demanded_args(
             on_before_file_validated,
-            allowed_file_types=allowed_types,
+            allowed_file_types=allowed_types_callback_arg,
             **callback_args
         )
 
@@ -149,28 +152,31 @@ def _traverse_dir_recursive(
             else:
                 _call_callback_with_demanded_args(
                     on_additional_file_found,
-                    allowed_file_types=allowed_types,
+                    allowed_file_types=allowed_types_callback_arg,
                     **callback_args
                 )
+
+        def _is_type_matching_pattern(file_type):
+            return any(pattern.match(file_type) for pattern in type_patterns)
 
         def _is_type_allowed(file_type):
             if file_type is DIRECTORY:
                 return DIRECTORY in allowed_types
             else:
-                return ANY_FILE in allowed_types or file_type in allowed_types
+                return ANY_FILE in allowed_types or file_type in allowed_types or _is_type_matching_pattern(file_type)
 
         def _validate(file_type, file_or_directory):
             if not _is_type_allowed(file_type):
                 _call_callback_with_demanded_args(
                     on_validation_failed,
-                    allowed_file_types=allowed_types,
+                    allowed_file_types=allowed_types_callback_arg,
                     file_or_directory=file_or_directory,
                     ** callback_args
                 )
 
             _call_callback_with_demanded_args(
                 on_after_file_validated,
-                allowed_file_types=allowed_types,
+                allowed_file_types=allowed_types_callback_arg,
                 file_or_directory=file_or_directory,
                 **callback_args
             )
@@ -181,7 +187,7 @@ def _traverse_dir_recursive(
             _validate(DIRECTORY, FileSystemItem.DIRECTORY)
             _traverse_dir_recursive(
                 dir_path=file_path,
-                schema=schema_value if schema is not None else None,
+                schema=schema_value if schema is not None and schema_value != "*" else None,
                 parent_directories=parent_directories + [file_name],
                 on_before_file_validated=on_before_file_validated,
                 on_unexpected_file_found=on_unexpected_file_found,
@@ -202,13 +208,23 @@ def _split_file_name(full_file_name):
 
 def _get_allowed_file_types(schema_value):
     if schema_value is None:
-        return []
+        return [], []
     if isinstance(schema_value, dict):
-        return [DIRECTORY]
+        return [DIRECTORY], []
     if isinstance(schema_value, str):
-        return _parse_file_type(schema_value)
+        if re.match(r"regex=\(.+\)", schema_value):
+            return [], [re.compile(schema_value[6:])]
+        else:
+            return [_parse_file_type(schema_value)], []
     if isinstance(schema_value, list):
-        return [_parse_file_type(file_type) for file_type in schema_value]
+        allowed_types = []
+        type_patterns = []
+        for file_type in schema_value:
+            if re.match(r"regex=\(.+\)", file_type):
+                type_patterns.append(re.compile(file_type[6:]))
+            else:
+                allowed_types.append(_parse_file_type(file_type))
+        return allowed_types, type_patterns
     raise ValueError(f"Invalid schema value {schema_value}")
 
 

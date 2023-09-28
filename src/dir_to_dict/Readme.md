@@ -46,3 +46,22 @@ The `*` key is a wildcard allowing any file name and any number of files.
 
 The `.*` value is a wildcard allowing any file. `*` allows any directory. To allow both
 directories and files, use `"*": [".*", "*"]`.
+
+### Regular Expressions
+
+To validate the file type you can also use one or more regular expressions. Regular expressions
+are marked with a special `regex=(<Your Regex goes here>)` syntax. For example:
+```python
+{
+    "my_file_name": [
+        ".yml",
+        "regex=(^\\.html\\d*$)",
+        "regex=(^\\.css\\d*$)"
+    ]
+}
+```
+In this example the expected directory structure contains a single file called `my_file_name`
+that has one of these file extensions:
+- `.yml`
+- `.html` followed by any number of digits, e.g. `.html`, `.html1`, `.html12`, etc.
+- `.css` followed by any number of digits, e.g. `.css`, `.css3`, `.css22`, etc.

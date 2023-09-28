@@ -66,8 +66,17 @@ def _validate_type_string(type_string):
         return "directory"
     elif re.match(r"^\.[a-zA-Z]+$", type_string):
         return "extension"
+    elif re.match(r"regex=\(.+\)", type_string):
+        _validate_regex(type_string[6:])
     else:
         raise ValueError(
             f"Schema types must be file extensions, the directory wildcard '*' or the file wildcard '.*', "
             f"but got '{type_string}'"
         )
+
+
+def _validate_regex(regex):
+    try:
+        re.compile(regex)
+    except re.error as e:
+        raise ValueError(f"Invalid regex ({regex})") from e
