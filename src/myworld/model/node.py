@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from pygame.math import Vector2
+
+from src.myworld.math2d import Vector2
 
 
 class Node(BaseModel):
