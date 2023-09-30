@@ -2,7 +2,7 @@
 
 My World is a (fantasy) map editor. Unlike other editors (Inkarnate, Wonderdraft, etc.) the maps are vector graphics
 instead of raster graphics. This means that they do not have a fixed resolution and no maximum size (well, the size
-is limited by the range of floating point numbers, but you know ¯\\_(ツ)_/¯).
+is limited by the range of floating point numbers, but you know ¯\_(ツ)_/¯).
 
 ## Features
 
