@@ -124,7 +124,7 @@ class Transform2(_numpy.ndarray):
         return inst
 
     def multiply(self, vector: "Vector2"):
-        return self @ vector
+        return (self @ vector).view(vector.__class__)
 
     def inverse(self):
         return _numpy.linalg.inv(self).view(Transform2)

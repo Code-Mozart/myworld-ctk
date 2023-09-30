@@ -8,10 +8,10 @@ class Camera:
     _zoom: Vector2 = Vector2.one()
     _viewport_offset: Vector2 = Vector2.zero()
 
-    def world(self, screen_point) -> Vector2:
+    def project_to_world(self, screen_point) -> Vector2:
         return self.transform.multiply(screen_point)
 
-    def screen(self, world_point) -> Vector2:
+    def project_to_screen(self, world_point) -> Vector2:
         return self._inverse.multiply(world_point)
 
     def __init__(self, position: Vector2 = None, zoom: Vector2 = None, viewport_offset: Vector2 = None):
@@ -29,7 +29,7 @@ class Camera:
 
     def recalculate_transform(self) -> Transform2:
         self.transform = Transform2.identity()
-        self.transform[0:2, 2] = self.position + self.viewport_offset
+        self.transform[0:2, 2] = (self.position + self.viewport_offset)[0:2]
         self.transform[0, 0] = self.zoom[0]
         self.transform[1, 1] = self.zoom[1]
         self._inverse = self.transform.inverse()

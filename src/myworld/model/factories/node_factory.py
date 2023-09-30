@@ -7,5 +7,5 @@ def load_node_from_tuple(node_tuple):
         raise ValueError("Node tuple must have 3 elements: (id, x, y)")
     return Node(
         id=node_tuple[0],
-        position=Vector2(node_tuple[1:3]),
+        position=Vector2(x=node_tuple[1], y=node_tuple[2]),
     )
