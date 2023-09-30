@@ -1,11 +1,11 @@
 from tkinter import Menu
-from customtkinter import CTk, CTkToplevel, CTkCanvas
+from customtkinter import CTk
 
 import i18n
 
 from src.myworld.model.factories import project_factory
 from src.myworld.model.project import Project
-from src.myworld.view.world_viewport import WorldViewport
+from src.myworld.view.viewport.world_viewport import WorldViewport
 
 
 class EditorWindow(CTk):
