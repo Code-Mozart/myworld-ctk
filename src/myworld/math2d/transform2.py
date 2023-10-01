@@ -65,6 +65,7 @@ class Transform2(_numpy.ndarray):
         if len(args) == 1:
             arg = args[0]
             init_helpers.ensure_arg_is_subscriptable(arg, 2, f"Vector2.{method_name}")
+            return arg
         if len(args) == 2:
             return args
 

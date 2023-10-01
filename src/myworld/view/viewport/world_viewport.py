@@ -12,6 +12,9 @@ class WorldViewport(CTkCanvas):
     _world: World | None = None
     _camera: Camera
 
+    pan_speed = 1.0
+    zoom_speed = 0.1
+
     node_radius = 5
 
     def __init__(self, master):
@@ -21,6 +24,7 @@ class WorldViewport(CTkCanvas):
         self._reset_camera()
 
         self.bind("<Configure>", self._on_resize)
+        self.bind("<MouseWheel>", self._on_mouse_scroll)
         self.bind("<ButtonPress-2>", self._on_mouse_down)
         self.bind("<B2-Motion>", self._on_mouse_drag)
 
@@ -40,12 +44,31 @@ class WorldViewport(CTkCanvas):
         self._reset_camera()
         self._redraw()
 
+    def _on_mouse_scroll(self, event):
+        zoom_factor = 1.0 + event.delta * self.zoom_speed
+        mouse_screen_pos = Vector2(x=event.x, y=event.y)
+        # mouse_world_pos = self._camera.project_to_world(Vector2(x=event.x, y=event.y))
+        self.zoom_on_screen_point(
+            screen_point=mouse_screen_pos,
+            zoom_factor=zoom_factor,
+        )
+
+    def zoom_on_screen_point(self, screen_point: Vector2, zoom_factor: float):
+        new_zoom = self._camera.zoom * zoom_factor
+        self._camera.set(
+            position=self._camera.position + (((zoom_factor - 1.0) / new_zoom) * (screen_point - self._camera.viewport_offset)),
+            # position=self._camera.position + screen_point * self._camera.zoom * (1.0 - zoom_factor),
+            zoom=new_zoom,
+        )
+
+        self._redraw()
+
     def _on_mouse_down(self, event):
         self.drag_start_world_pos = self._camera.project_to_world(Vector2(x=event.x, y=event.y))
 
     def _on_mouse_drag(self, event):
         drag_end_world_pos = self._camera.project_to_world(Vector2(x=event.x, y=event.y))
-        self._camera.position += drag_end_world_pos - self.drag_start_world_pos
+        self._camera.position -= (drag_end_world_pos - self.drag_start_world_pos) * self.pan_speed
         self.drag_start_world_pos = self._camera.project_to_world(Vector2(x=event.x, y=event.y))
 
         self._redraw()
@@ -81,7 +104,7 @@ class WorldViewport(CTkCanvas):
 
     def _draw_nodes(self):
         for node in self.world.nodes:
-            pos = self._camera.project_to_world(node.position)
+            pos = self._camera.project_to_screen(node.position)
             self.create_oval(
                 pos.x - self.node_radius,
                 pos.y - self.node_radius,

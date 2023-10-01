@@ -18,6 +18,9 @@ class EditorWindow(CTk):
         super().__init__()
         self.build()
 
+        # TODO: Remove, only for development
+        self.on_new_project()
+
     def build(self):
         self.title(i18n.t("myworld.editor_window.title"))
         self.geometry("800x600")
