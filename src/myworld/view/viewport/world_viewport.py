@@ -47,11 +47,18 @@ class WorldViewport(CTkCanvas):
     def _on_mouse_scroll(self, event):
         zoom_factor = 1.0 + event.delta * self.zoom_speed
         mouse_screen_pos = Vector2(x=event.x, y=event.y)
-        # mouse_world_pos = self._camera.project_to_world(Vector2(x=event.x, y=event.y))
         self.zoom_on_screen_point(
             screen_point=mouse_screen_pos,
             zoom_factor=zoom_factor,
         )
+
+    def zoom_on_world_point(self, world_point: Vector2, zoom_factor: float):
+        self._camera.set(
+            position=(self._camera.position + (world_point * (zoom_factor - 1.0))) / zoom_factor,
+            zoom=self._camera.zoom * zoom_factor,
+        )
+
+        self._redraw()
 
     def zoom_on_screen_point(self, screen_point: Vector2, zoom_factor: float):
         new_zoom = self._camera.zoom * zoom_factor
