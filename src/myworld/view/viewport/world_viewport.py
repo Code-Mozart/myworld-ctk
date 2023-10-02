@@ -92,8 +92,8 @@ class WorldViewport(CTkCanvas):
 
     def _on_resize(self, event):
         self._camera.viewport_offset = Vector2(
-            x=self.winfo_width() / 2,
-            y=self.winfo_height() / 2,
+            x=event.width / 2,
+            y=event.height / 2,
         )
         self._redraw()
 
