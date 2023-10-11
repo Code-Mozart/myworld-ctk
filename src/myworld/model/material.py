@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from src.myworld.model.base_model import BaseModel
 from pygame import Color
 
 

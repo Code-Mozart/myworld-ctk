@@ -1,11 +1,13 @@
 from customtkinter import CTkCanvas
 
 from src.myworld.math2d import Vector2
+from src.myworld.view.drawables.canvas import Canvas
 from src.myworld.view.viewport.camera import Camera
 
 
 class Viewport(CTkCanvas):
     _camera: Camera
+    _canvas: Canvas
 
     pan_speed = 1.0
     zoom_speed = 0.1
@@ -28,6 +30,10 @@ class Viewport(CTkCanvas):
             zoom=new_zoom,
         )
         self._redraw()
+
+    @property
+    def camera(self) -> Camera:
+        return self._camera
 
     #: OVERRIDEN METHODS
 
@@ -67,6 +73,7 @@ class Viewport(CTkCanvas):
         super().__init__(master=master)
         self._camera = Camera()
         self._reset_camera()
+        self._canvas = Canvas(widget=self)
 
         self.bind("<Configure>", self._on_resize)
         self.bind("<MouseWheel>", self._on_mouse_scroll)
@@ -86,4 +93,4 @@ class Viewport(CTkCanvas):
         )
 
     def _redraw(self):
-        pass
+        self._canvas.redraw()

@@ -12,11 +12,33 @@ class Camera:
     _zoom: Vector2 = Vector2.one()
     _viewport_offset: Vector2 = Vector2.zero()
 
-    def project_to_screen(self, world_point) -> Vector2:
+    def project_to_screen(self, world_point: Vector2) -> Vector2:
         return self._inverse.multiply(world_point)
 
-    def project_to_world(self, screen_point) -> Vector2:
+    def project_to_world(self, screen_point: Vector2) -> Vector2:
         return self.transform.multiply(screen_point)
+
+    def scale_to_screen(self, world_length: Vector2 | float) -> Vector2 | float:
+        if isinstance(world_length, Vector2):
+            return world_length * self._zoom
+        return world_length * self._zoom.x
+
+    def scale_to_world(self, screen_length: Vector2 | float) -> Vector2 | float:
+        if isinstance(screen_length, Vector2):
+            return screen_length / self._zoom
+        return screen_length / self._zoom.x
+
+    def width_to_screen(self, world_width: float) -> float:
+        return world_width * self._zoom.x
+
+    def height_to_screen(self, world_height: float) -> float:
+        return world_height * self._zoom.y
+
+    def width_to_world(self, screen_width: float) -> float:
+        return screen_width / self._zoom.x
+
+    def height_to_world(self, screen_height: float) -> float:
+        return screen_height / self._zoom.y
 
     def __init__(self, position: Vector2 = None, zoom: Vector2 = None, viewport_offset: Vector2 = None):
         self.set(position, zoom, viewport_offset)

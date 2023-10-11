@@ -50,6 +50,17 @@ class EditorWindow(CTk):
         self.viewport = WorldViewport(master=self)
         self.viewport.pack(fill="both", expand=True)
 
+        # context_menu = Menu(master=self.viewport, tearoff=0)
+        # context_menu.add_command(label=i18n.t("myworld.editor_window.world_viewport.context_menu.reset_camera"))
+        #
+        # def popup(event):
+        #     try:
+        #         context_menu.tk_popup(event.x_root, event.y_root)
+        #     finally:
+        #         context_menu.grab_release()
+        #
+        # self.viewport.bind("<ButtonRelease-2>", popup)
+
     def on_new_project(self):
         # check if there is a project already, that perhaps needs to be saved
 
